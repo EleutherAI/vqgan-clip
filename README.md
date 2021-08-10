@@ -14,6 +14,10 @@ Generates images from text prompts with VQGAN and CLIP (z+quantize method).
 
 Zero shot semantic style transfer
 
+### [VQGAN+CLIP_(Mse regulized z+quantize_method)](https://github.com/EleutherAI/vqgan-clip/blob/main/VQGAN%2BCLIP_(Mse%20regulized%20z%2Bquantize_method).ipynb)
+
+Generates images from text prompts with VQGAN and CLIP (z+quantize method) regulized with MSE.
+
 ## Non-VQGAN CLIP methods
 
 ### [OpenAI_dVAE+CLIP.ipynb](https://github.com/EleutherAI/vqgan-clip/blob/main/OpenAI_dVAE%2BCLIP.ipynb)
