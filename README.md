@@ -28,6 +28,10 @@ Generates images from text prompts with CLIP guided diffusion.
 
 Generates images from text prompts with CLIP guided diffusion.
 
+### [CLIP_Guided_Diffusion_HQ_512x512.ipynb](https://github.com/EleutherAI/vqgan-clip/blob/main/CLIP_Guided_Diffusion_HQ_512x512.ipynb)
+
+Generates images from text prompts with CLIP guided diffusion.
+
 ### [CLIP_Decision_Transformer.ipynb](https://github.com/EleutherAI/vqgan-clip/blob/main/CLIP_Decision_Transformer.ipynb)
 
 Generates images from text prompts with a CLIP conditioned Decision Transformer.
