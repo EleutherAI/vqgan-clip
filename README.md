@@ -10,9 +10,9 @@ Generates images from text prompts with VQGAN and CLIP (codebook sampling method
 
 Generates images from text prompts with VQGAN and CLIP (z+quantize method).
 
-### [VQGAN+CLIP_(Mse regulized z+quantize_method)](https://github.com/EleutherAI/vqgan-clip/blob/main/VQGAN%2BCLIP_(Mse%20regulized%20z%2Bquantize_method).ipynb)
+### [VQGAN+CLIP_(MSE regularized z+quantize_method)](https://github.com/EleutherAI/vqgan-clip/blob/main/VQGAN%2BCLIP_(MSE%20regularized%20z%2Bquantize_method).ipynb)
 
-Generates images from text prompts with VQGAN and CLIP (z+quantize method) regulized with MSE.
+Generates images from text prompts with VQGAN and CLIP (z+quantize method) regularized with MSE.
 
 ### [Semantic_Style_Transfer_with_CLIP+VQGAN_(Gumbel_VQGAN).ipynb](https://github.com/EleutherAI/vqgan-clip/blob/main/Semantic_Style_Transfer_with_CLIP%2BVQGAN_(Gumbel_VQGAN).ipynb) ([on Colab](https://colab.research.google.com/drive/1kNZYKlGRkkW4SDoawnq1ZoH0jhnX_jlV))
 
