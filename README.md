@@ -28,7 +28,7 @@ Generates images from text prompts with the OpenAI discrete VAE and CLIP.
 
 Generates images from text prompts with CLIP guided diffusion.
 
-### [CLIP_Guided_Diffusion_HQ.ipynb](https://github.com/EleutherAI/vqgan-clip/blob/main/CLIP_Guided_Diffusion_HQ.ipynb) ([on Colab](https://colab.research.google.com/drive/12a_Wrfi2_gwwAuN3VvMTwVMz9TfqctNj))
+### [CLIP_Guided_Diffusion_HQ_256x256.ipynb](https://github.com/EleutherAI/vqgan-clip/blob/main/CLIP_Guided_Diffusion_HQ_256x256.ipynb) ([on Colab](https://colab.research.google.com/drive/12a_Wrfi2_gwwAuN3VvMTwVMz9TfqctNj))
 
 Generates images from text prompts with CLIP guided diffusion.
 
