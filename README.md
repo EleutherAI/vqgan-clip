@@ -30,19 +30,27 @@ Codebook sampling optimizes a grid of independent categorical distributions over
 
 ### [CLIP_Guided_Diffusion.ipynb](https://github.com/EleutherAI/vqgan-clip/blob/main/CLIP_Guided_Diffusion.ipynb) ([on Colab](https://colab.research.google.com/drive/1ED6_MYVXTApBHzQObUPaaMolgf9hZOOF))
 
-Generates images from text prompts with CLIP guided diffusion (256x256 output size). CLIP guided diffusion samples from the diffusion model conditional on the output image being near the target CLIP embedding. In this notebook, the fact that CLIP is not noise level conditioned is dealt with by applying a Gaussian blur with timestep-dependent radius before processing the current timestep's output with CLIP.
+Generates images from text prompts with CLIP guided diffusion (256x256 output size).
+
+CLIP guided diffusion samples from the diffusion model conditional on the output image being near the target CLIP embedding. In this notebook, the fact that CLIP is not noise level conditioned is dealt with by applying a Gaussian blur with timestep-dependent radius before processing the current timestep's output with CLIP.
 
 ### [CLIP_Guided_Diffusion_HQ_256x256.ipynb](https://github.com/EleutherAI/vqgan-clip/blob/main/CLIP_Guided_Diffusion_HQ_256x256.ipynb) ([on Colab](https://colab.research.google.com/drive/12a_Wrfi2_gwwAuN3VvMTwVMz9TfqctNj))
 
-Generates images from text prompts with CLIP guided diffusion (256x256 output size). CLIP guided diffusion samples from the diffusion model conditional on the output image being near the target CLIP embedding. In this notebook, the fact that CLIP is not noise level conditioned is dealt with by obtaining a denoised prediction of the final timestep and processing that with CLIP.
+Generates images from text prompts with CLIP guided diffusion (256x256 output size).
+
+CLIP guided diffusion samples from the diffusion model conditional on the output image being near the target CLIP embedding. In this notebook, the fact that CLIP is not noise level conditioned is dealt with by obtaining a denoised prediction of the final timestep and processing that with CLIP.
 
 ### [CLIP_Guided_Diffusion_HQ_512x512.ipynb](https://github.com/EleutherAI/vqgan-clip/blob/main/CLIP_Guided_Diffusion_HQ_512x512.ipynb) ([on Colab](https://colab.research.google.com/drive/1V66mUeJbXrTuQITvJunvnWVn96FEbSI3))
 
-Generates images from text prompts with CLIP guided diffusion (512x512 output size). CLIP guided diffusion samples from the diffusion model conditional on the output image being near the target CLIP embedding. In this notebook, the fact that CLIP is not noise level conditioned is dealt with by obtaining a denoised prediction of the final timestep and processing that with CLIP. It uses a class-conditional diffusion model and this is dealt with by randomizing the input class on each timestep.
+Generates images from text prompts with CLIP guided diffusion (512x512 output size).
+
+CLIP guided diffusion samples from the diffusion model conditional on the output image being near the target CLIP embedding. In this notebook, the fact that CLIP is not noise level conditioned is dealt with by obtaining a denoised prediction of the final timestep and processing that with CLIP. It uses a class-conditional diffusion model and this is dealt with by randomizing the input class on each timestep.
 
 ### [CLIP_Guided_Diffusion_HQ_512x512_Uncond.ipynb](https://github.com/EleutherAI/vqgan-clip/blob/main/CLIP_Guided_Diffusion_HQ_512x512_Uncond.ipynb) ([on Colab](https://colab.research.google.com/drive/1QBsaDAZv8np29FPbvjffbE1eytoJcsgA))
 
-Generates images from text prompts with CLIP guided diffusion (512x512 output size). CLIP guided diffusion samples from the diffusion model conditional on the output image being near the target CLIP embedding. In this notebook, the fact that CLIP is not noise level conditioned is dealt with by obtaining a denoised prediction of the final timestep and processing that with CLIP. It uses an unconditional diffusion model that was fine-tuned from the released 512x512 conditional diffusion model using the same training set but with no class labels.
+Generates images from text prompts with CLIP guided diffusion (512x512 output size).
+
+CLIP guided diffusion samples from the diffusion model conditional on the output image being near the target CLIP embedding. In this notebook, the fact that CLIP is not noise level conditioned is dealt with by obtaining a denoised prediction of the final timestep and processing that with CLIP. It uses an unconditional diffusion model that was fine-tuned from the released 512x512 conditional diffusion model using the same training set but with no class labels.
 
 ### [CLIP_Decision_Transformer.ipynb](https://github.com/EleutherAI/vqgan-clip/blob/main/CLIP_Decision_Transformer.ipynb) ([on Colab](https://colab.research.google.com/drive/1dFV3GCR5kasYiAl8Bl4fBlLOCdCfjufI))
 
