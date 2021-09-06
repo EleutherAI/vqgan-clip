@@ -52,6 +52,10 @@ Generates images from text prompts with CLIP guided diffusion (512x512 output si
 
 CLIP guided diffusion samples from the diffusion model conditional on the output image being near the target CLIP embedding. In this notebook, the fact that CLIP is not noise level conditioned is dealt with by obtaining a denoised prediction of the final timestep and processing that with CLIP. It uses an unconditional diffusion model that was fine-tuned from the released 512x512 conditional diffusion model using the same training set but with no class labels.
 
+### [CLIP_Semantic_Segmentation.ipynb](https://github.com/EleutherAI/vqgan-clip/blob/main/CLIP_Semantic_Segmentation.ipynb) ([on Colab](https://colab.research.google.com/drive/1BMfl0s0kdgQOTNfeJSF2n6x7Y4D3IyeZ))
+
+Generates a mask from an image using a pixel-wise average over random crops scored by CLIP. In other words, this is a Monte Carlo method. Needs to be calibrated for optimal results. Also used in CLIP Semantic Segmentation
+
 ### [CLIP_Decision_Transformer.ipynb](https://github.com/EleutherAI/vqgan-clip/blob/main/CLIP_Decision_Transformer.ipynb) ([on Colab](https://colab.research.google.com/drive/1dFV3GCR5kasYiAl8Bl4fBlLOCdCfjufI))
 
 Generates images from text prompts with a CLIP conditioned Decision Transformer.
