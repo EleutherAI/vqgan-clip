@@ -13,3 +13,5 @@ curl -L -o checkpoints/vqgan_imagenet_f16_16384.ckpt -C - 'https://heibox.uni-he
 ```
 
 Now you can run `python generate.py -p "A painting of an apple in a fruit bowl"`
+
+If your computer cannot find `taming-transformers` or `CLIP`, check to make sure that the corresponding directories are not empty. If they are empty, clone the necessary repository.
