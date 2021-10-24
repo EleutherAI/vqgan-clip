@@ -10,8 +10,8 @@ import os
 sys.path.append('taming-transformers')
 
 from omegaconf import OmegaConf
+
 from taming.models import cond_transformer, vqgan
-#import taming.modules 
 
 import torch
 from torch import nn, optim
