@@ -4,7 +4,13 @@ Largely based off of [NerdyRodent's code](https://github.com/nerdyrodent/VQGAN-C
 
 ## Quick Start
 
-First install dependencies via `pip install -r requirements.txt`. Then download a vqgaan checkpoint with a command like:
+First install dependencies via `pip install -r requirements.txt`. Then clone the `CLIP` and `taming-transformer` repositories with
+```
+git clone https://github.com/openai/CLIP
+git clone https://github.com/CompVis/taming-transformers/
+```
+
+Next, download a vqgaan checkpoint with a command like:
 ```
 mkdir checkpoints
 
@@ -12,6 +18,4 @@ curl -L -o checkpoints/vqgan_imagenet_f16_16384.yaml -C - 'https://heibox.uni-he
 curl -L -o checkpoints/vqgan_imagenet_f16_16384.ckpt -C - 'https://heibox.uni-heidelberg.de/d/a7530b09fed84f80a887/files/?p=%2Fckpts%2Flast.ckpt&dl=1' #ImageNet 16384
 ```
 
-Now you can run `python generate.py -p "A painting of an apple in a fruit bowl"`
-
-If your computer cannot find `taming-transformers` or `CLIP`, check to make sure that the corresponding directories are not empty. If they are empty, clone the necessary repository.
+You are now ready to go! Try `python generate.py -p "A painting of an apple in a fruit bowl".
