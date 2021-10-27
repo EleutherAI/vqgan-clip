@@ -134,5 +134,59 @@ def parse():
 if __name__ == 'main':
     
     args = parse()
+    
+    pMs = []
+    normalize = transforms.Normalize(mean=[0.48145466, 0.4578275, 0.40821073],
+                                      std=[0.26862954, 0.26130258, 0.27577711])
+
+
+    # CLIP tokenize/encode   
+    if args.prompts:
+        for prompt in args.prompts:
+            txt, weight, stop = split_prompt(prompt)
+            embed = perceptor.encode_text(clip.tokenize(txt).to(device)).float()
+            pMs.append(Prompt(embed, weight, stop).to(device))
+
+    for prompt in args.image_prompts:
+        path, weight, stop = split_prompt(prompt)
+        img = Image.open(path)
+        pil_image = img.convert('RGB')
+        img = resize_image(pil_image, (sideX, sideY))
+        batch = make_cutouts(TF.to_tensor(img).unsqueeze(0).to(device))
+        embed = perceptor.encode_image(normalize(batch)).float()
+        pMs.append(Prompt(embed, weight, stop).to(device))
+
+    for seed, weight in zip(args.noise_prompt_seeds, args.noise_prompt_weights):
+        gen = torch.Generator().manual_seed(seed)
+        embed = torch.empty([1, perceptor.visual.output_dim]).normal_(generator=gen)
+        pMs.append(Prompt(embed, weight).to(device))
+
+
+    # Set the optimiser
+    opt = get_opt(args.optimiser, args.step_size)
+
+
+    # Output for the user
+    print('Using device:', device)
+    print('Optimising using:', args.optimiser)
+
+    if args.prompts:
+        print('Using text prompts:', args.prompts)  
+    if args.image_prompts:
+        print('Using image prompts:', args.image_prompts)
+    if args.init_image:
+        print('Using initial image:', args.init_image)
+    if args.noise_prompt_weights:
+        print('Noise prompt weights:', args.noise_prompt_weights)    
+
+
+    if args.seed is None:
+        seed = torch.seed()
+    else:
+        seed = args.seed  
+    torch.manual_seed(seed)
+    print('Using seed:', seed)
+
+
 
     
