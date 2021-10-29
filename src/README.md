@@ -1,6 +1,6 @@
 # Local VQGAN-CLIP
 
-Largely based off of [NerdyRodent's code](https://github.com/nerdyrodent/VQGAN-CLIP), which is largely based on our own notebooks. They also have the start of a [guided defusion](https://github.com/nerdyrodent/CLIP-Guided-Diffusion) repo.
+Largely based off of [NerdyRodent's code](https://github.com/nerdyrodent/VQGAN-CLIP), which is largely based on our own notebooks. They also have the start of a [Guided Diffusion](https://github.com/nerdyrodent/CLIP-Guided-Diffusion) repo.
 
 ## Quick Start
 
