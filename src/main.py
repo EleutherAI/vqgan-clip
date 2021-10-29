@@ -186,7 +186,35 @@ if __name__ == 'main':
         seed = args.seed  
     torch.manual_seed(seed)
     print('Using seed:', seed)
+    
+    
+    i = 0 # Iteration counter
+    j = 0 # Zoom video frame counter    
+    p = 1 # Phrase counter
+    smoother = 0 # Smoother counter
+    this_video_frame = 0 # for video styling
 
+    with tqdm() as pbar:
+        while i < args.max_iterations:
+            # Change text prompt
+            if args.prompt_frequency > 0:
+                if i % args.prompt_frequency == 0 and i > 0:
+                    # In case there aren't enough phrases, just loop
+                    if p >= len(all_phrases):
+                        p = 0
+                    
+                    pMs = []
+                    args.prompts = all_phrases[p]
 
-
+                    # Show user we're changing prompt                                
+                    print(args.prompts)
+                    
+                    for prompt in args.prompts:
+                        txt, weight, stop = split_prompt(prompt)
+                        embed = perceptor.encode_text(clip.tokenize(txt).to(device)).float()
+                        pMs.append(Prompt(embed, weight, stop).to(device))                    
+                    p += 1
+            train(i)
+            i += 1
+            pbar.update()
     
