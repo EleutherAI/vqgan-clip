@@ -6,7 +6,6 @@ setup(
     description='VQGAN-CLIP: Zero-Shot Semantic Image Generation and Editing',
     packages=find_packages(),
     install_requires=[
-        absl_py,
         aiohttp,
         attrs,
         backcall,
