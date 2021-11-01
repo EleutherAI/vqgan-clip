@@ -2,6 +2,7 @@ import argparse
 import math
 import random
 
+import src
 from src.optimizers import *
 from src.grad import *
 from src.helpers import *
@@ -28,7 +29,7 @@ torch.backends.cudnn.benchmark = False
 from torch_optimizer import DiffGrad, AdamP, RAdam
 
 from src.CLIP import clip
-#import kornia.augmentation as K
+import kornia.augmentation as K
 import numpy as np
 import imageio
 
@@ -198,15 +199,15 @@ if __name__ == '__main__':
     # Cutout class options:
     # 'latest','original','updated' or 'updatedpooling'
     if args.cut_method == 'latest':
-        make_cutouts = MakeCutouts(cut_size, args.cutn, cut_pow=args.cut_pow)
+        make_cutouts = MakeCutouts(args, cut_size, args.cutn)
     elif args.cut_method == 'original':
-        make_cutouts = MakeCutoutsOrig(cut_size, args.cutn, cut_pow=args.cut_pow)
+        make_cutouts = MakeCutoutsOrig(args, cut_size, args.cutn)
     elif args.cut_method == 'updated':
-        make_cutouts = MakeCutoutsUpdate(cut_size, args.cutn, cut_pow=args.cut_pow)
+        make_cutouts = MakeCutoutsUpdate(args, cut_size, args.cutn)
     elif args.cut_method == 'nrupdated':
-        make_cutouts = MakeCutoutsNRUpdate(cut_size, args.cutn, cut_pow=args.cut_pow)
+        make_cutouts = MakeCutoutsNRUpdate(args, cut_size, args.cutn)
     else:
-        make_cutouts = MakeCutoutsPoolingUpdate(cut_size, args.cutn, cut_pow=args.cut_pow)    
+        make_cutouts = MakeCutoutsPoolingUpdate(args, cut_size, args.cutn)
 
     toksX, toksY = args.size[0] // f, args.size[1] // f
     sideX, sideY = toksX * f, toksY * f
@@ -287,7 +288,7 @@ if __name__ == '__main__':
 
 
     # Set the optimiser
-    opt = get_opt(args.optimiser, args.step_size)
+    opt, z = src.optimizers.get_opt(args.optimiser, z, args.step_size)
 
 
     # Output for the user
