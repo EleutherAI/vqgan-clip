@@ -174,7 +174,7 @@ class MakeCutoutsPoolingUpdate(nn.Module):
 
 # An Nerdy updated version with selectable Kornia augments, but no pooling:
 class MakeCutoutsNRUpdate(nn.Module):
-    def __init__(self, cut_size, cutn, cut_pow=1.):
+    def __init__(self, args, cut_size, cutn, cut_pow=1.):
         super().__init__()
         self.cut_size = cut_size
         self.cutn = cutn
