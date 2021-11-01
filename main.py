@@ -180,6 +180,28 @@ def load_vqgan_model(config_path, checkpoint_path):
     del model.loss
     return model
 
+def ascend_txt():
+    global i
+    out = synth(z)
+    iii = perceptor.encode_image(normalize(make_cutouts(out))).float()
+    
+    result = []
+
+    if args.init_weight:
+        # result.append(F.mse_loss(z, z_orig) * args.init_weight / 2)
+        result.append(F.mse_loss(z, torch.zeros_like(z_orig)) * ((1/torch.tensor(i*2 + 1))*args.init_weight) / 2)
+
+    for prompt in pMs:
+        result.append(prompt(iii))
+    
+    if args.make_video:    
+        img = np.array(out.mul(255).clamp(0, 255)[0].cpu().detach().numpy().astype(np.uint8))[:,:,:]
+        img = np.transpose(img, (1, 2, 0))
+        imageio.imwrite('./steps/' + str(i) + '.png', np.array(img))
+
+    return result # return loss
+
+
 def train(i):
     opt.zero_grad(set_to_none=True)
     lossAll = ascend_txt()
