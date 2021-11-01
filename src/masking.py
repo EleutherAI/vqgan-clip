@@ -3,6 +3,8 @@ from torch import nn, optim
 from torch.nn import functional as F
 from torchvision import transforms
 
+import kornia.augmentation as K
+
 class BoxCropper(object): 
     def __init__(self, w=0.3, h=0.3):
       self.w, self.h = w, h
