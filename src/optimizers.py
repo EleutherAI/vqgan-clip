@@ -5,7 +5,7 @@ from torch_optimizer import DiffGrad, AdamP, RAdam
 
 
 # Set the optimiser
-def get_opt(opt_name, opt_lr):
+def get_opt(opt_name, z, opt_lr):
     if opt_name == "Adam":
         opt = optim.Adam([z], lr=opt_lr)    # LR=0.1 (Default)
     elif opt_name == "AdamW":
@@ -25,4 +25,4 @@ def get_opt(opt_name, opt_lr):
     else:
         print("Unknown optimiser. Are choices broken?")
         opt = optim.Adam([z], lr=opt_lr)
-    return opt
+    return opt, z
