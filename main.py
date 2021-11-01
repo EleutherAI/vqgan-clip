@@ -185,6 +185,73 @@ if __name__ == '__main__':
     jit = True if float(torch.__version__[:3]) < 1.8 else False
     perceptor = clip.load(args.clip_model, jit=jit)[0].eval().requires_grad_(False).to(device)
     
+
+    cut_size = perceptor.visual.input_resolution
+    f = 2**(model.decoder.num_resolutions - 1)
+
+    # Cutout class options:
+    # 'latest','original','updated' or 'updatedpooling'
+    if args.cut_method == 'latest':
+        make_cutouts = MakeCutouts(cut_size, args.cutn, cut_pow=args.cut_pow)
+    elif args.cut_method == 'original':
+        make_cutouts = MakeCutoutsOrig(cut_size, args.cutn, cut_pow=args.cut_pow)
+    elif args.cut_method == 'updated':
+        make_cutouts = MakeCutoutsUpdate(cut_size, args.cutn, cut_pow=args.cut_pow)
+    elif args.cut_method == 'nrupdated':
+        make_cutouts = MakeCutoutsNRUpdate(cut_size, args.cutn, cut_pow=args.cut_pow)
+    else:
+        make_cutouts = MakeCutoutsPoolingUpdate(cut_size, args.cutn, cut_pow=args.cut_pow)    
+
+    toksX, toksY = args.size[0] // f, args.size[1] // f
+    sideX, sideY = toksX * f, toksY * f
+
+    # Gumbel or not?
+    if gumbel:
+        e_dim = 256
+        n_toks = model.quantize.n_embed
+        z_min = model.quantize.embed.weight.min(dim=0).values[None, :, None, None]
+        z_max = model.quantize.embed.weight.max(dim=0).values[None, :, None, None]
+    else:
+        e_dim = model.quantize.e_dim
+        n_toks = model.quantize.n_e
+        z_min = model.quantize.embedding.weight.min(dim=0).values[None, :, None, None]
+        z_max = model.quantize.embedding.weight.max(dim=0).values[None, :, None, None]
+
+
+    if args.init_image:
+        if 'http' in args.init_image:
+          img = Image.open(urlopen(args.init_image))
+        else:
+          img = Image.open(args.init_image)
+        pil_image = img.convert('RGB')
+        pil_image = pil_image.resize((sideX, sideY), Image.LANCZOS)
+        pil_tensor = TF.to_tensor(pil_image)
+        z, *_ = model.encode(pil_tensor.to(device).unsqueeze(0) * 2 - 1)
+    elif args.init_noise == 'pixels':
+        img = random_noise_image(args.size[0], args.size[1])    
+        pil_image = img.convert('RGB')
+        pil_image = pil_image.resize((sideX, sideY), Image.LANCZOS)
+        pil_tensor = TF.to_tensor(pil_image)
+        z, *_ = model.encode(pil_tensor.to(device).unsqueeze(0) * 2 - 1)
+    elif args.init_noise == 'gradient':
+        img = random_gradient_image(args.size[0], args.size[1])
+        pil_image = img.convert('RGB')
+        pil_image = pil_image.resize((sideX, sideY), Image.LANCZOS)
+        pil_tensor = TF.to_tensor(pil_image)
+        z, *_ = model.encode(pil_tensor.to(device).unsqueeze(0) * 2 - 1)
+    else:
+        one_hot = F.one_hot(torch.randint(n_toks, [toksY * toksX], device=device), n_toks).float()
+        # z = one_hot @ model.quantize.embedding.weight
+        if gumbel:
+            z = one_hot @ model.quantize.embed.weight
+        else:
+            z = one_hot @ model.quantize.embedding.weight
+
+        z = z.view([-1, toksY, toksX, e_dim]).permute(0, 3, 1, 2) 
+        #z = torch.rand_like(z)*2						# NR: check
+
+    z_orig = z.clone()
+    z.requires_grad_(True)    
     pMs = []
     normalize = transforms.Normalize(mean=[0.48145466, 0.4578275, 0.40821073],
                                       std=[0.26862954, 0.26130258, 0.27577711])
