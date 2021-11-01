@@ -76,11 +76,11 @@ def aggregate(samples, labels, model):
 
 
 class MakeCutouts(nn.Module):
-    def __init__(self, args, cut_size, cutn, cut_pow=1.):
+    def __init__(self, args, cut_size, cutn):
         super().__init__()
         self.cut_size = cut_size
         self.cutn = cutn
-        self.cut_pow = cut_pow # not used with pooling
+        self.cut_pow = args.cut_pow # not used with pooling
         
         # Pick your own augments & their order
         augment_list = []
@@ -137,11 +137,11 @@ class MakeCutouts(nn.Module):
 
 # An updated version with Kornia augments and pooling (where my version started):
 class MakeCutoutsPoolingUpdate(nn.Module):
-    def __init__(self, cut_size, cutn, cut_pow=1.):
+    def __init__(self, cut_size, cutn):
         super().__init__()
         self.cut_size = cut_size
         self.cutn = cutn
-        self.cut_pow = cut_pow # Not used with pooling
+        self.cut_pow = args.cut_pow # Not used with pooling
 
         self.augs = nn.Sequential(
             K.RandomAffine(degrees=15, translate=0.1, p=0.7, padding_mode='border'),
@@ -174,11 +174,11 @@ class MakeCutoutsPoolingUpdate(nn.Module):
 
 # An Nerdy updated version with selectable Kornia augments, but no pooling:
 class MakeCutoutsNRUpdate(nn.Module):
-    def __init__(self, args, cut_size, cutn, cut_pow=1.):
+    def __init__(self, args, cut_size, cutn):
         super().__init__()
         self.cut_size = cut_size
         self.cutn = cutn
-        self.cut_pow = cut_pow
+        self.cut_pow = args.cut_pow
         self.noise_fac = 0.1
         
         # Pick your own augments & their order
@@ -230,11 +230,11 @@ class MakeCutoutsNRUpdate(nn.Module):
 
 # An updated version with Kornia augments, but no pooling:
 class MakeCutoutsUpdate(nn.Module):
-    def __init__(self, cut_size, cutn, cut_pow=1.):
+    def __init__(self, cut_size, cutn):
         super().__init__()
         self.cut_size = cut_size
         self.cutn = cutn
-        self.cut_pow = cut_pow
+        self.cut_pow = args.cut_pow
         self.augs = nn.Sequential(
             K.RandomHorizontalFlip(p=0.5),
             K.ColorJitter(hue=0.01, saturation=0.01, p=0.7),
@@ -265,11 +265,11 @@ class MakeCutoutsUpdate(nn.Module):
 
 # This is the original version (No pooling)
 class MakeCutoutsOrig(nn.Module):
-    def __init__(self, cut_size, cutn, cut_pow=1.):
+    def __init__(self, cut_size, cutn):
         super().__init__()
         self.cut_size = cut_size
         self.cutn = cutn
-        self.cut_pow = cut_pow
+        self.cut_pow = args.cut_pow
 
     def forward(self, input):
         sideY, sideX = input.shape[2:4]
