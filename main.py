@@ -21,6 +21,8 @@ torch.backends.cudnn.benchmark = False
 
 from torch_optimizer import DiffGrad, AdamP, RAdam
 
+from src import *
+
 from src.CLIP import clip
 #import kornia.augmentation as K
 import numpy as np
@@ -129,14 +131,47 @@ def parse():
     return args
 
 
+#NR: Split prompts and weights
+def split_prompt(prompt):
+    vals = prompt.rsplit(':', 2)
+    vals = vals + ['', '1', '-inf'][len(vals):]
+    return vals[0], float(vals[1]), float(vals[2])
 
 
-if __name__ == 'main':
+def load_vqgan_model(config_path, checkpoint_path):
+    global gumbel
+    gumbel = False
+    config = OmegaConf.load(config_path)
+    if config.model.target == 'taming.models.vqgan.VQModel':
+        model = vqgan.VQModel(**config.model.params)
+        model.eval().requires_grad_(False)
+        model.init_from_ckpt(checkpoint_path)
+    elif config.model.target == 'taming.models.vqgan.GumbelVQ':
+        model = vqgan.GumbelVQ(**config.model.params)
+        model.eval().requires_grad_(False)
+        model.init_from_ckpt(checkpoint_path)
+        gumbel = True
+    elif config.model.target == 'taming.models.cond_transformer.Net2NetTransformer':
+        parent_model = cond_transformer.Net2NetTransformer(**config.model.params)
+        parent_model.eval().requires_grad_(False)
+        parent_model.init_from_ckpt(checkpoint_path)
+        model = parent_model.first_stage_model
+    else:
+        raise ValueError(f'unknown model type: {config.model.target}')
+    del model.loss
+    return model
 
-    print("hi")
 
-def test():
+
+if __name__ == '__main__':
+
     args = parse()
+
+    # Do it
+    device = torch.device(args.cuda_device)
+    model = load_vqgan_model(args.vqgan_config, args.vqgan_checkpoint).to(device)
+    jit = True if float(torch.__version__[:3]) < 1.8 else False
+    perceptor = clip.load(args.clip_model, jit=jit)[0].eval().requires_grad_(False).to(device)
     
     pMs = []
     normalize = transforms.Normalize(mean=[0.48145466, 0.4578275, 0.40821073],

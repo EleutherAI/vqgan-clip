@@ -50,3 +50,34 @@ def inner_dist(x,y):
     x_normed = F.normalize(x, dim=-1)
     y_normed = F.normalize(y, dim=-1)
     return bdot(x_normed, y_normed)
+
+
+def load_vqgan_model(config_path, checkpoint_path):
+    global gumbel
+    gumbel = False
+    config = OmegaConf.load(config_path)
+    if config.model.target == 'taming.models.vqgan.VQModel':
+        model = vqgan.VQModel(**config.model.params)
+        model.eval().requires_grad_(False)
+        model.init_from_ckpt(checkpoint_path)
+    elif config.model.target == 'taming.models.vqgan.GumbelVQ':
+        model = vqgan.GumbelVQ(**config.model.params)
+        model.eval().requires_grad_(False)
+        model.init_from_ckpt(checkpoint_path)
+        gumbel = True
+    elif config.model.target == 'taming.models.cond_transformer.Net2NetTransformer':
+        parent_model = cond_transformer.Net2NetTransformer(**config.model.params)
+        parent_model.eval().requires_grad_(False)
+        parent_model.init_from_ckpt(checkpoint_path)
+        model = parent_model.first_stage_model
+    else:
+        raise ValueError(f'unknown model type: {config.model.target}')
+    del model.loss
+    return model
+
+
+def resize_image(image, out_size):
+    ratio = image.size[0] / image.size[1]
+    area = min(image.size[0] * image.size[1], out_size[0] * out_size[1])
+    size = round((area * ratio)**0.5), round((area / ratio)**0.5)
+    return image.resize(size, Image.LANCZOS)
