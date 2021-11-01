@@ -21,8 +21,6 @@ torch.backends.cudnn.benchmark = False
 
 from torch_optimizer import DiffGrad, AdamP, RAdam
 
-from src import *
-
 from src.CLIP import clip
 #import kornia.augmentation as K
 import numpy as np
