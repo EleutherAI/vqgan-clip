@@ -180,6 +180,20 @@ def load_vqgan_model(config_path, checkpoint_path):
     del model.loss
     return model
 
+def train(i):
+    opt.zero_grad(set_to_none=True)
+    lossAll = ascend_txt()
+    
+    if i % args.display_freq == 0:
+        checkin(i, lossAll)
+       
+    loss = sum(lossAll)
+    loss.backward()
+    opt.step()
+    
+    #with torch.no_grad():
+    with torch.inference_mode():
+        z.copy_(z.maximum(z_min).minimum(z_max))
 
 
 if __name__ == '__main__':
