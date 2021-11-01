@@ -21,8 +21,8 @@ torch.backends.cudnn.benchmark = False
 
 from torch_optimizer import DiffGrad, AdamP, RAdam
 
-from CLIP import clip
-import kornia.augmentation as K
+from src.CLIP import clip
+#import kornia.augmentation as K
 import numpy as np
 import imageio
 
@@ -132,7 +132,10 @@ def parse():
 
 
 if __name__ == 'main':
-    
+
+    print("hi")
+
+def test():
     args = parse()
     
     pMs = []
@@ -147,6 +150,7 @@ if __name__ == 'main':
             embed = perceptor.encode_text(clip.tokenize(txt).to(device)).float()
             pMs.append(Prompt(embed, weight, stop).to(device))
 
+    print("lol")
     for prompt in args.image_prompts:
         path, weight, stop = split_prompt(prompt)
         img = Image.open(path)
@@ -218,3 +222,4 @@ if __name__ == 'main':
             i += 1
             pbar.update()
     
+    print("done")
