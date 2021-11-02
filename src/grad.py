@@ -1,5 +1,7 @@
+
 import torch
-from torch import optim
+from torch import nn, optim
+from torch.nn import functional as F
 from torch_optimizer import DiffGrad, AdamP, RAdam
 
 class ReplaceGrad(torch.autograd.Function):
@@ -50,3 +52,12 @@ def get_opt(opt_name, opt_lr):
         print("Unknown optimiser. Are choices broken?")
         opt = optim.Adam([z], lr=opt_lr)
     return opt
+
+
+
+def vector_quantize(x, codebook):
+    d = x.pow(2).sum(dim=-1, keepdim=True) + codebook.pow(2).sum(dim=1) - 2 * x @ codebook.T
+    indices = d.argmin(-1)
+    x_q = F.one_hot(indices, codebook.shape[0]).to(d.dtype) @ codebook
+    return replace_grad(x_q, x)
+

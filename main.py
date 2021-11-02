@@ -2,6 +2,13 @@ import argparse
 import math
 import random
 
+import src
+from src.optimizers import *
+from src.grad import *
+from src.helpers import *
+from src.inits import *
+from src.masking import *
+
 from urllib.request import urlopen
 from tqdm import tqdm
 import sys
@@ -21,10 +28,8 @@ torch.backends.cudnn.benchmark = False
 
 from torch_optimizer import DiffGrad, AdamP, RAdam
 
-from src import *
-
 from src.CLIP import clip
-#import kornia.augmentation as K
+import kornia.augmentation as K
 import numpy as np
 import imageio
 
@@ -176,6 +181,62 @@ def load_vqgan_model(config_path, checkpoint_path):
     return model
 
 
+# Vector quantize
+def synth(z):
+    if gumbel:
+        z_q = vector_quantize(z.movedim(1, 3), model.quantize.embed.weight).movedim(3, 1)
+    else:
+        z_q = vector_quantize(z.movedim(1, 3), model.quantize.embedding.weight).movedim(3, 1)
+    return clamp_with_grad(model.decode(z_q).add(1).div(2), 0, 1)
+
+
+@torch.inference_mode()
+def checkin(i, losses):
+    losses_str = ', '.join(f'{loss.item():g}' for loss in losses)
+    tqdm.write(f'i: {i}, loss: {sum(losses).item():g}, losses: {losses_str}')
+    out = synth(z)
+    info = PngImagePlugin.PngInfo()
+    info.add_text('comment', f'{args.prompts}')
+    TF.to_pil_image(out[0].cpu()).save(args.output, pnginfo=info) 	
+
+
+def ascend_txt():
+    global i
+    out = synth(z)
+    iii = perceptor.encode_image(normalize(make_cutouts(out))).float()
+    
+    result = []
+
+    if args.init_weight:
+        # result.append(F.mse_loss(z, z_orig) * args.init_weight / 2)
+        result.append(F.mse_loss(z, torch.zeros_like(z_orig)) * ((1/torch.tensor(i*2 + 1))*args.init_weight) / 2)
+
+    for prompt in pMs:
+        result.append(prompt(iii))
+    
+    if args.make_video:    
+        img = np.array(out.mul(255).clamp(0, 255)[0].cpu().detach().numpy().astype(np.uint8))[:,:,:]
+        img = np.transpose(img, (1, 2, 0))
+        imageio.imwrite('./steps/' + str(i) + '.png', np.array(img))
+
+    return result # return loss
+
+
+def train(i):
+    opt.zero_grad(set_to_none=True)
+    lossAll = ascend_txt()
+    
+    if i % args.display_freq == 0:
+        checkin(i, lossAll)
+       
+    loss = sum(lossAll)
+    loss.backward()
+    opt.step()
+    
+    #with torch.no_grad():
+    with torch.inference_mode():
+        z.copy_(z.maximum(z_min).minimum(z_max))
+
 
 if __name__ == '__main__':
 
@@ -187,6 +248,73 @@ if __name__ == '__main__':
     jit = True if float(torch.__version__[:3]) < 1.8 else False
     perceptor = clip.load(args.clip_model, jit=jit)[0].eval().requires_grad_(False).to(device)
     
+
+    cut_size = perceptor.visual.input_resolution
+    f = 2**(model.decoder.num_resolutions - 1)
+
+    # Cutout class options:
+    # 'latest','original','updated' or 'updatedpooling'
+    if args.cut_method == 'latest':
+        make_cutouts = MakeCutouts(args, cut_size, args.cutn)
+    elif args.cut_method == 'original':
+        make_cutouts = MakeCutoutsOrig(args, cut_size, args.cutn)
+    elif args.cut_method == 'updated':
+        make_cutouts = MakeCutoutsUpdate(args, cut_size, args.cutn)
+    elif args.cut_method == 'nrupdated':
+        make_cutouts = MakeCutoutsNRUpdate(args, cut_size, args.cutn)
+    else:
+        make_cutouts = MakeCutoutsPoolingUpdate(args, cut_size, args.cutn)
+
+    toksX, toksY = args.size[0] // f, args.size[1] // f
+    sideX, sideY = toksX * f, toksY * f
+
+    # Gumbel or not?
+    if gumbel:
+        e_dim = 256
+        n_toks = model.quantize.n_embed
+        z_min = model.quantize.embed.weight.min(dim=0).values[None, :, None, None]
+        z_max = model.quantize.embed.weight.max(dim=0).values[None, :, None, None]
+    else:
+        e_dim = model.quantize.e_dim
+        n_toks = model.quantize.n_e
+        z_min = model.quantize.embedding.weight.min(dim=0).values[None, :, None, None]
+        z_max = model.quantize.embedding.weight.max(dim=0).values[None, :, None, None]
+
+
+    if args.init_image:
+        if 'http' in args.init_image:
+          img = Image.open(urlopen(args.init_image))
+        else:
+          img = Image.open(args.init_image)
+        pil_image = img.convert('RGB')
+        pil_image = pil_image.resize((sideX, sideY), Image.LANCZOS)
+        pil_tensor = TF.to_tensor(pil_image)
+        z, *_ = model.encode(pil_tensor.to(device).unsqueeze(0) * 2 - 1)
+    elif args.init_noise == 'pixels':
+        img = random_noise_image(args.size[0], args.size[1])    
+        pil_image = img.convert('RGB')
+        pil_image = pil_image.resize((sideX, sideY), Image.LANCZOS)
+        pil_tensor = TF.to_tensor(pil_image)
+        z, *_ = model.encode(pil_tensor.to(device).unsqueeze(0) * 2 - 1)
+    elif args.init_noise == 'gradient':
+        img = random_gradient_image(args.size[0], args.size[1])
+        pil_image = img.convert('RGB')
+        pil_image = pil_image.resize((sideX, sideY), Image.LANCZOS)
+        pil_tensor = TF.to_tensor(pil_image)
+        z, *_ = model.encode(pil_tensor.to(device).unsqueeze(0) * 2 - 1)
+    else:
+        one_hot = F.one_hot(torch.randint(n_toks, [toksY * toksX], device=device), n_toks).float()
+        # z = one_hot @ model.quantize.embedding.weight
+        if gumbel:
+            z = one_hot @ model.quantize.embed.weight
+        else:
+            z = one_hot @ model.quantize.embedding.weight
+
+        z = z.view([-1, toksY, toksX, e_dim]).permute(0, 3, 1, 2) 
+        #z = torch.rand_like(z)*2						# NR: check
+
+    z_orig = z.clone()
+    z.requires_grad_(True)    
     pMs = []
     normalize = transforms.Normalize(mean=[0.48145466, 0.4578275, 0.40821073],
                                       std=[0.26862954, 0.26130258, 0.27577711])
@@ -216,7 +344,7 @@ if __name__ == '__main__':
 
 
     # Set the optimiser
-    opt = get_opt(args.optimiser, args.step_size)
+    opt, z = src.optimizers.get_opt(args.optimiser, z, args.step_size)
 
 
     # Output for the user
