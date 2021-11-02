@@ -180,6 +180,26 @@ def load_vqgan_model(config_path, checkpoint_path):
     del model.loss
     return model
 
+
+# Vector quantize
+def synth(z):
+    if gumbel:
+        z_q = vector_quantize(z.movedim(1, 3), model.quantize.embed.weight).movedim(3, 1)
+    else:
+        z_q = vector_quantize(z.movedim(1, 3), model.quantize.embedding.weight).movedim(3, 1)
+    return clamp_with_grad(model.decode(z_q).add(1).div(2), 0, 1)
+
+
+@torch.inference_mode()
+def checkin(i, losses):
+    losses_str = ', '.join(f'{loss.item():g}' for loss in losses)
+    tqdm.write(f'i: {i}, loss: {sum(losses).item():g}, losses: {losses_str}')
+    out = synth(z)
+    info = PngImagePlugin.PngInfo()
+    info.add_text('comment', f'{args.prompts}')
+    TF.to_pil_image(out[0].cpu()).save(args.output, pnginfo=info) 	
+
+
 def ascend_txt():
     global i
     out = synth(z)
