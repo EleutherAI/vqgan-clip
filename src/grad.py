@@ -1,5 +1,7 @@
+
 import torch
-from torch import optim
+from torch import nn, optim
+from torch.nn import functional as F
 from torch_optimizer import DiffGrad, AdamP, RAdam
 
 class ReplaceGrad(torch.autograd.Function):
