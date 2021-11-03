@@ -1,4 +1,5 @@
 vqgan_clip.egg-info
 vqgan_clip/__pycache__/*
+vqgan_clip/__pycache__/__init__.cpython-38.pyc
 *.pyc
 checkpoints/*
