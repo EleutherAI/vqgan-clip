@@ -256,12 +256,12 @@ if __name__ == '__main__':
         make_cutouts = MakeCutouts(args, cut_size, args.cutn)
     elif args.cut_method == 'original':
         make_cutouts = MakeCutoutsOrig(args, cut_size, args.cutn)
-    elif args.cut_method == 'updated':
-        make_cutouts = MakeCutoutsUpdate(args, cut_size, args.cutn)
-    elif args.cut_method == 'nrupdated':
-        make_cutouts = MakeCutoutsNRUpdate(args, cut_size, args.cutn)
-    else:
-        make_cutouts = MakeCutoutsPoolingUpdate(args, cut_size, args.cutn)
+    # elif args.cut_method == 'updated':
+    #     make_cutouts = MakeCutoutsUpdate(args, cut_size, args.cutn)
+    # elif args.cut_method == 'nrupdated':
+    #     make_cutouts = MakeCutoutsNRUpdate(args, cut_size, args.cutn)
+    # else:
+    #     make_cutouts = MakeCutoutsPoolingUpdate(args, cut_size, args.cutn)
 
     toksX, toksY = args.size[0] // f, args.size[1] // f
     sideX, sideY = toksX * f, toksY * f
