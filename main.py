@@ -2,12 +2,7 @@ import argparse
 import math
 import random
 
-import src
-from src.optimizers import *
-from src.grad import *
-from src.helpers import *
-from src.inits import *
-from src.masking import *
+from vqgan_clip import optimizers, grad, helpers, inits, masking
 
 from urllib.request import urlopen
 from tqdm import tqdm
