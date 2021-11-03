@@ -53,14 +53,14 @@ def parse():
 
     vq_parser = argparse.ArgumentParser(description='Image generation using VQGAN+CLIP')
 
-    vq_parser.add_argument("-aug",  "--augments", nargs='+', action='append', type=str, choices=['Ji','Sh','Gn','Pe','Ro','Af','Et','Ts','Cr','Er','Re'],
-                           help="Enabled augments (latest vut method only)", default=[['Af', 'Pe', 'Ji', 'Er']], dest='augments')
+    vq_parser.add_argument("-aug",  "--augments", nargs='+', action='append', type=str, choices=['Hf','Ji','Sh','Gn','Pe','Ro','Af','Et','Ts','Cr','Er','Re'],
+                           help="Enabled augments (latest vut method only)", default=[['Hf','Af', 'Pe', 'Ji', 'Er']], dest='augments')
     vq_parser.add_argument("-cd",   "--cuda_device", type=str, help="Cuda device to use", default="cuda:0", dest='cuda_device')
     vq_parser.add_argument("-ckpt", "--vqgan_checkpoint", type=str, help="VQGAN checkpoint", default=f'checkpoints/vqgan_imagenet_f16_16384.ckpt',
                            dest='vqgan_checkpoint')
     vq_parser.add_argument("-conf", "--vqgan_config", type=str, help="VQGAN config", default=f'checkpoints/vqgan_imagenet_f16_16384.yaml', dest='vqgan_config')
     vq_parser.add_argument("-cpe",  "--change_prompt_every", type=int, help="Prompt change frequency", default=0, dest='prompt_frequency')
-    vq_parser.add_argument("-cutm", "--cut_method", type=str, help="Cut method", choices=['original','updated','nrupdated','updatedpooling','latest'],
+    vq_parser.add_argument("-cutm", "--cut_method", type=str, help="Cut method", choices=['original','latest'],
                            default='latest', dest='cut_method')
     vq_parser.add_argument("-cutp", "--cut_power", type=float, help="Cut power", default=1., dest='cut_pow')
     vq_parser.add_argument("-cuts", "--num_cuts", type=int, help="Number of cuts", default=32, dest='cutn')
@@ -256,12 +256,6 @@ if __name__ == '__main__':
         make_cutouts = MakeCutouts(args, cut_size, args.cutn)
     elif args.cut_method == 'original':
         make_cutouts = MakeCutoutsOrig(args, cut_size, args.cutn)
-    # elif args.cut_method == 'updated':
-    #     make_cutouts = MakeCutoutsUpdate(args, cut_size, args.cutn)
-    # elif args.cut_method == 'nrupdated':
-    #     make_cutouts = MakeCutoutsNRUpdate(args, cut_size, args.cutn)
-    # else:
-    #     make_cutouts = MakeCutoutsPoolingUpdate(args, cut_size, args.cutn)
 
     toksX, toksY = args.size[0] // f, args.size[1] // f
     sideX, sideY = toksX * f, toksY * f
