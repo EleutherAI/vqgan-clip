@@ -1,6 +1,6 @@
-# Local VQGAN-CLIP
+# VQGAN-CLIP
 
-Largely based off of [NerdyRodent's code](https://github.com/nerdyrodent/VQGAN-CLIP), which is largely based on our own notebooks. They also have the start of a [Guided Diffusion](https://github.com/nerdyrodent/CLIP-Guided-Diffusion) repo.
+VQGAN-CLIP is a semantic image generation and editing methodology developed by members of EleutherAI.
 
 ## Quick Start
 
