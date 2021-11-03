@@ -2,7 +2,11 @@ import argparse
 import math
 import random
 
-from vqgan_clip import optimizers, grad, helpers, inits, masking
+from vqgan_clip.grad import *
+from vqgan_clip.helpers import *
+from vqgan_clip.inits import *
+from vqgan_clip.masking import *
+from vqgan_clip.optimizers import *
 
 from urllib.request import urlopen
 from tqdm import tqdm
@@ -23,7 +27,7 @@ torch.backends.cudnn.benchmark = False
 
 from torch_optimizer import DiffGrad, AdamP, RAdam
 
-from src.CLIP import clip
+import clip
 import kornia.augmentation as K
 import numpy as np
 import imageio
@@ -46,7 +50,7 @@ elif get_device_properties(0).total_memory <= 2 ** 33:  # 2 ** 33 = 8,589,934,59
     default_image_size = 318  # <8GB VRAM
 
 def parse():
-    
+
     vq_parser = argparse.ArgumentParser(description='Image generation using VQGAN+CLIP')
 
     vq_parser.add_argument("-aug",  "--augments", nargs='+', action='append', type=str, choices=['Ji','Sh','Gn','Pe','Ro','Af','Et','Ts','Cr','Er','Re'],
@@ -92,12 +96,11 @@ def parse():
     vq_parser.add_argument("-zsx",  "--zoom_shift_x", type=int, help="Zoom shift x (left/right) amount in pixels", default=0, dest='zoom_shift_x')
     vq_parser.add_argument("-zsy",  "--zoom_shift_y", type=int, help="Zoom shift y (up/down) amount in pixels", default=0, dest='zoom_shift_y')
     vq_parser.add_argument("-zvid", "--zoom_video", action='store_true', help="Create zoom video?", dest='make_zoom_video')
-    
-    
+
     args = vq_parser.parse_args()
-    
+
     if not args.prompts and not args.image_prompts:
-        args.prompts = "A cute, smiling, Nerdy Rodent"
+        raise Exception("You must supply a text or image prompt")
 
     torch.backends.cudnn.deterministic = args.cudnn_determinism
 
@@ -105,15 +108,15 @@ def parse():
     if args.prompts:
         # For stories, there will be many phrases
         story_phrases = [phrase.strip() for phrase in args.prompts.split("^")]
-    
+
         # Make a list of all phrases
         all_phrases = []
         for phrase in story_phrases:
             all_phrases.append(phrase.split("|"))
-    
+
         # First phrase
         args.prompts = all_phrases[0]
-    
+
     # Split target images using the pipe character (weights are split later)
     if args.image_prompts:
         args.image_prompts = args.image_prompts.split("|")
@@ -122,12 +125,12 @@ def parse():
     if args.make_video and args.make_zoom_video:
         print("Warning: Make video and make zoom video are mutually exclusive.")
         args.make_video = False
-    
+
     # Make video steps directory
     if args.make_video or args.make_zoom_video:
         if not os.path.exists('steps'):
             os.mkdir('steps')
-    
+
     return args
 
 class Prompt(nn.Module):
@@ -339,7 +342,7 @@ if __name__ == '__main__':
 
 
     # Set the optimiser
-    opt, z = src.optimizers.get_opt(args.optimiser, z, args.step_size)
+    opt, z = get_opt(args.optimiser, z, args.step_size)
 
 
     # Output for the user
