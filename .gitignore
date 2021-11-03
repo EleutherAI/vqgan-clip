@@ -1,0 +1,4 @@
+vqgan_clip.egg-info
+vqgan_clip/__pycache__/*
+*.pyc
+checkpoints/*
