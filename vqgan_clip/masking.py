@@ -184,7 +184,7 @@ class MakeCutouts(nn.Module):
         sideY, sideX = input.shape[2:4]
         cutouts = []
 
-        min_size_width = min(sideX, sideY)
+        min_size_width = min(sideX, sideY, self.cut_size)
         lower_bound = float(self.cut_size/min_size_width)
 
         for _ in range(self.cutn):
