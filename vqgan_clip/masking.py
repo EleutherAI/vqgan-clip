@@ -69,8 +69,7 @@ class ClampWithGrad(torch.autograd.Function):
         return grad_in * (grad_in * (input - input.clamp(ctx.min, ctx.max)) >= 0), None, None
 
 replace_grad = ReplaceGrad.apply
-
-clamp_with_grad = ClampWithGrad.apply
+clamp_with_grad = torch.clamp #ClampWithGrad.apply
 
 class BoxCropper(object): 
     def __init__(self, w=0.3, h=0.3):
@@ -200,7 +199,7 @@ class MakeCutouts(nn.Module):
             facs = batch.new_empty([self.cutn, 1, 1, 1]).uniform_(0, self.noise_fac)
             batch = batch + facs * torch.randn_like(batch)
 
-        return clamp_with_grad(batch)
+        return clamp_with_grad(batch, 0, 1)
 
 
 # This is the original version (No pooling)
