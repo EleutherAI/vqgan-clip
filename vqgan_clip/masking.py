@@ -243,7 +243,10 @@ class MakeCutoutsOrig(nn.Module):
 
     def forward(self, input):
         sideY, sideX = input.shape[2:4]
+        max_size = min(sideX, sideY)
+        min_size = min(sideX, sideY, self.cut_size)
         cutouts = []
+        
 
         for _ in range(self.cutn):
             size = int(torch.rand([])**self.cut_pow * (max_size - min_size) + min_size)
