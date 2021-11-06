@@ -44,6 +44,34 @@ def resample(input, size, align_corners=True):
     input = input.view([n, c, h, w])
     return F.interpolate(input, size, mode='bicubic', align_corners=align_corners)
 
+class ReplaceGrad(torch.autograd.Function):
+    @staticmethod
+    def forward(ctx, x_forward, x_backward):
+        ctx.shape = x_backward.shape
+        return x_forward
+
+    @staticmethod
+    def backward(ctx, grad_in):
+        return None, grad_in.sum_to_size(ctx.shape)
+
+
+class ClampWithGrad(torch.autograd.Function):
+    @staticmethod
+    def forward(ctx, input, min, max):
+        ctx.min = min
+        ctx.max = max
+        ctx.save_for_backward(input)
+        return input.clamp(min, max)
+
+    @staticmethod
+    def backward(ctx, grad_in):
+        input, = ctx.saved_tensors
+        return grad_in * (grad_in * (input - input.clamp(ctx.min, ctx.max)) >= 0), None, None
+
+replace_grad = ReplaceGrad.apply
+
+clamp_with_grad = ClampWithGrad.apply
+
 class BoxCropper(object): 
     def __init__(self, w=0.3, h=0.3):
       self.w, self.h = w, h
