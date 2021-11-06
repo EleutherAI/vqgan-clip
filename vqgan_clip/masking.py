@@ -5,6 +5,27 @@ from torchvision import transforms
 
 import kornia.augmentation as K
 
+def resample(input, size, align_corners=True):
+    n, c, h, w = input.shape
+    dh, dw = size
+
+    input = input.view([n * c, 1, h, w])
+
+    if dh < h:
+        kernel_h = lanczos(ramp(dh / h, 2), 2).to(input.device, input.dtype)
+        pad_h = (kernel_h.shape[0] - 1) // 2
+        input = F.pad(input, (0, 0, pad_h, pad_h), 'reflect')
+        input = F.conv2d(input, kernel_h[None, None, :, None])
+
+    if dw < w:
+        kernel_w = lanczos(ramp(dw / w, 2), 2).to(input.device, input.dtype)
+        pad_w = (kernel_w.shape[0] - 1) // 2
+        input = F.pad(input, (pad_w, pad_w, 0, 0), 'reflect')
+        input = F.conv2d(input, kernel_w[None, None, None, :])
+
+    input = input.view([n, c, h, w])
+    return F.interpolate(input, size, mode='bicubic', align_corners=align_corners)
+
 class BoxCropper(object): 
     def __init__(self, w=0.3, h=0.3):
       self.w, self.h = w, h
@@ -177,9 +198,6 @@ class MakeCutoutsOrig(nn.Module):
     def forward(self, input):
         sideY, sideX = input.shape[2:4]
         cutouts = []
-
-        min_size_width = min(sideX, sideY)
-        lower_bound = float(self.cut_size/min_size_width)
 
         for _ in range(self.cutn):
             size = int(torch.rand([])**self.cut_pow * (max_size - min_size) + min_size)

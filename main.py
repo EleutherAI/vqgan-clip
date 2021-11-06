@@ -53,7 +53,7 @@ def parse():
 
     vq_parser = argparse.ArgumentParser(description='Image generation using VQGAN+CLIP')
 
-    vq_parser.add_argument("-aug",  "--augments", nargs='+', action='append', type=str, choices=['Hf','Ji','Sh','Gn','Pe','Ro','Af','Et','Ts','Cr','Er','Re'],
+    vq_parser.add_argument("-aug",  "--augments", nargs='+', action='append', type=str, choices=['Hf','Ji','Sh','Pe','Ro','Af','Et','Ts','Er'],
                            help="Enabled augments (latest vut method only)", default=[['Hf','Af', 'Pe', 'Ji', 'Er']], dest='augments')
     vq_parser.add_argument("-cd",   "--cuda_device", type=str, help="Cuda device to use", default="cuda:0", dest='cuda_device')
     vq_parser.add_argument("-ckpt", "--vqgan_checkpoint", type=str, help="VQGAN checkpoint", default=f'checkpoints/vqgan_imagenet_f16_16384.ckpt',
