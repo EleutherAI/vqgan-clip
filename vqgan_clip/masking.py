@@ -259,7 +259,7 @@ class MakeCutoutsOrig(nn.Module):
             facs = batch.new_empty([self.cutn, 1, 1, 1]).uniform_(0, self.noise_fac)
             batch = batch + facs * torch.randn_like(batch)
 
-        return batch
+        return clamp_with_grad(batch, 0, 1)
 
 def visualise(source, masks):
     source = TF.to_tensor(source)
