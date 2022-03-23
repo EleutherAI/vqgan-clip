@@ -12,7 +12,7 @@ Codebook sampling optimizes a grid of independent categorical distributions over
 
 Generates images from text prompts with VQGAN and CLIP (z+quantize method).
 
-### [VQGAN+CLIP_(MSE regularized z+quantize_method)](https://github.com/EleutherAI/vqgan-clip/blob/main/VQGAN%2BCLIP_(MSE%20regularized%20z%2Bquantize_method).ipynb)
+### [VQGAN+CLIP_(MSE regularized z+quantize_method)](https://github.com/EleutherAI/vqgan-clip/blob/main/notebooks/VQGAN%2BCLIP_(MSE%20regularized%20z%2Bquantize_method).ipynb)
 
 Generates images from text prompts with VQGAN and CLIP (z+quantize method) regularized with MSE.
 
