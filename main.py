@@ -37,6 +37,7 @@ ImageFile.LOAD_TRUNCATED_IMAGES = True
 
 from subprocess import Popen, PIPE
 import re
+from packaging import version
 
 # Supress warnings
 import warnings
@@ -243,7 +244,7 @@ if __name__ == '__main__':
     # Do it
     device = torch.device(args.cuda_device)
     model = load_vqgan_model(args.vqgan_config, args.vqgan_checkpoint).to(device)
-    jit = True if float(torch.__version__[:3]) < 1.8 else False
+    jit = True if version.parse(torch.__version__) < version.parse('1.8.0') else False
     perceptor = clip.load(args.clip_model, jit=jit)[0].eval().requires_grad_(False).to(device)
     
 
